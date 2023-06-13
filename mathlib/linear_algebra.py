@@ -1,3 +1,4 @@
+# 线性代数工具类
 from math import sin, cos, pi, atan2, sqrt
 
 
@@ -21,8 +22,6 @@ def length(vector):
     return sqrt(x ** 2 + y ** 2)
 
 
-if __name__ == '__main__':
-    a = 37 * pi / 180
-    print(to_cartesian((5, a)))
-
-    print(to_polar((1, 0)))
+# 多维向量的长度
+def length_multi(v):
+    return sqrt(sum([coord ** 2 for coord in v]))
