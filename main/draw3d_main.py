@@ -10,6 +10,15 @@ def test_draw3d():
     )
 
 
+def test_render():
+    render(octahedron, color_map=matplotlib.colormaps.get_cmap('Blues'), lines=black)
+
+
+def test_draw_polyhedron():
+    draw_polyhedron(3)
+
+
 if __name__ == '__main__':
     print(matplotlib.__version__)
-    test_draw3d()
+    test_render()
+    test_draw_polyhedron()

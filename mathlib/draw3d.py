@@ -1,13 +1,13 @@
-from math import sqrt, pi
 import matplotlib
-import os
-from matplotlib.patches import Polygon, FancyArrowPatch
-from matplotlib.collections import PatchCollection
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D, proj3d
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from mathlib.colors import *
 import numpy as np
+from matplotlib.patches import FancyArrowPatch
+from mpl_toolkits.mplot3d import proj3d
+from numpy import add
+
+from mathlib.colors import *
+from mathlib.draw2d import draw2d, Polygon2D
+from mathlib.vectors import dot, unit, normal, face_to_2d
 
 
 ## https://stackoverflow.com/a/22867877/1704140
@@ -166,3 +166,51 @@ def draw3d(*objects, origin=True, axes=True, width=6, save_as=None, azim=None, e
         plt.savefig(save_as)
 
     plt.show()
+
+
+def split(face):
+    midpoints = [unit(add(face[i], face[(i + 1) % len(face)])) for i in range(0, len(face))]
+    triangles = [(face[i], midpoints[i], midpoints[(i - 1) % len(face)]) for i in range(0, len(face))]
+    return [midpoints] + triangles
+
+
+def rec_split(faces, depth=0):
+    if depth == 0:
+        return faces
+    else:
+        return rec_split([new_face for face in faces for new_face in split(face)], depth - 1)
+
+
+octahedron = [
+    [(1, 0, 0), (0, 1, 0), (0, 0, 1)],
+    [(1, 0, 0), (0, 0, -1), (0, 1, 0)],
+    [(1, 0, 0), (0, 0, 1), (0, -1, 0)],
+    [(1, 0, 0), (0, -1, 0), (0, 0, -1)],
+    [(-1, 0, 0), (0, 0, 1), (0, 1, 0)],
+    [(-1, 0, 0), (0, 1, 0), (0, 0, -1)],
+    [(-1, 0, 0), (0, -1, 0), (0, 0, 1)],
+    [(-1, 0, 0), (0, 0, -1), (0, -1, 0)],
+]
+
+
+# NICE SPHERE!
+def sphere_approx(n):
+    return rec_split(octahedron, n)
+
+
+def render(faces, light=(1, 2, 3), color_map=matplotlib.colormaps.get_cmap('Blues'), lines=None):
+    polygons = []
+    for face in faces:
+        unit_normal = unit(normal(face))  # 1
+        if unit_normal[2] > 0:  # 2
+            c = color_map(1 - dot(unit(normal(face)), unit(light)))  # 3
+            p = Polygon2D(*face_to_2d(face), fill=c, color=lines)  # 4
+            polygons.append(p)
+    draw2d(*polygons, axes=False, origin=False, grid=None)
+
+
+def draw_polyhedron(n):
+    """
+    绘制多面体
+    """
+    render(sphere_approx(n), lines='k')
