@@ -1,4 +1,4 @@
-from mathlib.linear_algebra import *
+from mathlib.vectors import *
 
 
 def test_dot(u, v):
