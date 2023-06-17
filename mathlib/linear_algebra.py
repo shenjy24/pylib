@@ -25,3 +25,8 @@ def length(vector):
 # 多维向量的长度
 def length_multi(v):
     return sqrt(sum([coord ** 2 for coord in v]))
+
+
+# 计算点积
+def dot(u, v):
+    return sum([coord1 * coord2 for coord1, coord2 in zip(u, v)])
